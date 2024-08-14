@@ -1,2 +1,4 @@
 audio1.mp3
 .venv-llm
+backend/.env
+frontend/.env
