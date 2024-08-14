@@ -1,4 +1,4 @@
 files/*
-.venv-llm
+.venv_llm
 backend/.env
 frontend/.env
