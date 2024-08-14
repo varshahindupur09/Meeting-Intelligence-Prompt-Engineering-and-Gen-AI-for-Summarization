@@ -10,12 +10,8 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnableLambda
-import whisper
 import openai
 from pymongo import MongoClient
-
-# Load the Whisper model
-model = whisper.load_model("base")
 
 app = FastAPI()
 env_path = os.path.join(os.getcwd(), ".env")
