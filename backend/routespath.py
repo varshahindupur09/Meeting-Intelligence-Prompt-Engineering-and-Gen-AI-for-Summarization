@@ -8,6 +8,9 @@ from langchain_community.vectorstores import Pinecone
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnableLambda
 import whisper
 import openai
 from pymongo import MongoClient
@@ -46,8 +49,34 @@ collection = db_mongo["transcriptions"]
 embeddings = OpenAIEmbeddings(deployment="text-similarity-ada-001")
 vectorstore = Pinecone.from_existing_index(index_name=pinecone_index_name, embedding=embeddings)
 
-llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
-qa_chain = load_qa_chain(llm, chain_type="stuff")
+# RAG prompt
+# Refine the prompt template to directly incorporate the context
+template = f"""You are an intelligent meeting assistant. Use the following minutes of the meeting to understand and answer the questions from this
+    Context: {context}
+    Question: {question}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+llm = ChatOpenAI(temperature=0.5, model_name="gpt-3.5-turbo")
+output_parser = StrOutputParser()
+
+# qa_chain = load_qa_chain(llm, chain_type="stuff")
+# Runnable chain for dynamic retrieval and question answering
+def create_retriever(query: str):
+    return vectorstore.similarity_search(query)
+
+dynamic_retriever = RunnableLambda(lambda inputs: create_retriever(inputs['question']))
+
+def get_question(inputs):
+    return inputs['question']
+
+chain = (
+    RunnableParallel({"context": dynamic_retriever, "question": get_question})
+    | prompt
+    | llm
+    | output_parser
+)
+
 
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
@@ -104,23 +133,11 @@ async def ask_from_audio(file_name: str = Form(...), question: str = Form(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving transcription: {str(e)}")
 
-    # Store transcription in Pinecone (assuming store_in_pinecone and vectorstore are defined)
-    store_in_pinecone(context)
+    # Run the RAG chain with the retrieved transcription and the question
+    inputs = {"context": context, "question": question}
+    result = chain.invoke(inputs)
 
-    # Perform RAG: Retrieve relevant documents from Pinecone and generate a response
-    docs = vectorstore.similarity_search(question, k=5)
-    answer = qa_chain.run(input_documents=docs, question=question)
-
-    return {"transcription": context, "answer": answer}
-
-def store_in_pinecone(text):
-    # vector = embeddings.embed_query(text)
-    # vectorstore.add_texts([text], [vector], [{"metadata": {"text": text}}])
-    # Assuming you want to store each piece of text along with its vector and metadata
-    vector = embeddings.embed_query(text)
-    metadata = {"text": text}  # Metadata should be a dictionary
-    # Ensure that both `text` and `vector` are lists, and `metadata` is a list of dictionaries
-    vectorstore.add_texts([text], [vector], [metadata])
+    return {"transcription": context, "answer": result}
 
 
 if __name__ == "__main__":
