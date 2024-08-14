@@ -7,7 +7,6 @@ from pinecone import Pinecone as client
 from langchain_community.vectorstores import Pinecone
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.chat_models import ChatOpenAI
-from langchain.chains.question_answering import load_qa_chain
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnableLambda
@@ -16,7 +15,7 @@ import openai
 from pymongo import MongoClient
 
 # Load the Whisper model
-model = whisper.load_model("base")  # You can choose from "tiny", "base", "small", "medium", "large"
+model = whisper.load_model("base")
 
 app = FastAPI()
 env_path = os.path.join(os.getcwd(), ".env")
@@ -50,17 +49,15 @@ embeddings = OpenAIEmbeddings(deployment="text-similarity-ada-001")
 vectorstore = Pinecone.from_existing_index(index_name=pinecone_index_name, embedding=embeddings)
 
 # RAG prompt
-# Refine the prompt template to directly incorporate the context
-template = f"""You are an intelligent meeting assistant. Use the following minutes of the meeting to understand and answer the questions from this
+def create_prompt(context, question):
+    return f"""You are an intelligent meeting assistant. Use the following minutes of the meeting to understand and answer the questions from this:
     Context: {context}
     Question: {question}
-"""
+    """
 
-prompt = ChatPromptTemplate.from_template(template)
 llm = ChatOpenAI(temperature=0.5, model_name="gpt-3.5-turbo")
 output_parser = StrOutputParser()
 
-# qa_chain = load_qa_chain(llm, chain_type="stuff")
 # Runnable chain for dynamic retrieval and question answering
 def create_retriever(query: str):
     return vectorstore.similarity_search(query)
@@ -70,13 +67,14 @@ dynamic_retriever = RunnableLambda(lambda inputs: create_retriever(inputs['quest
 def get_question(inputs):
     return inputs['question']
 
+# Correct the prompt creation and the chain's invocation logic
 chain = (
     RunnableParallel({"context": dynamic_retriever, "question": get_question})
-    | prompt
+    | RunnableLambda(lambda inputs: create_prompt(inputs["context"], inputs["question"]))
+    | RunnableLambda(lambda prompt: [{"role": "user", "content": prompt}])  # Convert the prompt to the format expected by the LLM
     | llm
     | output_parser
 )
-
 
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
