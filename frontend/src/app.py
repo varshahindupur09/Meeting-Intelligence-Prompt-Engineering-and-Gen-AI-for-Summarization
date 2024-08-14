@@ -19,7 +19,7 @@ if not os.path.exists(upload_dir):
     os.makedirs(upload_dir)
 
 # Streamlit file uploader
-uploaded_file = st.file_uploader("Upload your audio file", type=["mp3", "wav", "ogg"])
+uploaded_file = st.file_uploader("Upload your text file", type=["txt"])
 
 if uploaded_file is not None:
     # Save the uploaded file to the directory
@@ -28,4 +28,4 @@ if uploaded_file is not None:
         f.write(uploaded_file.getbuffer())
     st.success(f"File saved to {file_path}")
     
-    # You can now process the file as neededs
+    
