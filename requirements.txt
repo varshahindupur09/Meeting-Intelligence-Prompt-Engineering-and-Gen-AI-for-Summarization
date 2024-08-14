@@ -1,0 +1,10 @@
+fastapi==0.112.0
+huggingface-hub==0.24.5
+numpy==2.0.1
+pandas==2.2.2
+scikit-learn==1.5.1
+scipy==1.13.1
+sentence-transformers==3.0.1
+streamlit==1.37.1
+tqdm==4.66.5
+transformers==4.44.0
