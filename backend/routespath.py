@@ -49,11 +49,16 @@ embeddings = OpenAIEmbeddings(deployment="text-similarity-ada-001")
 vectorstore = Pinecone.from_existing_index(index_name=pinecone_index_name, embedding=embeddings)
 
 # RAG prompt
+# def create_prompt(context, question):
+#     return f"""You are an intelligent meeting assistant. Use the following minutes of the meeting to understand and answer the questions as accurately as possible based on the provided context.
+#     Context: {context}
+#     Question: {question}
+#     Please provide the answer strictly based on the information in the context above.
+#     """
+
 def create_prompt(context, question):
-    return f"""You are an intelligent meeting assistant. Use the following minutes of the meeting to understand and answer the questions from this:
-    Context: {context}
-    Question: {question}
-    """
+    return f"""Answer the question based only on the following context:{context} Question: {question}"""
+
 
 llm = ChatOpenAI(temperature=0.5, model_name="gpt-3.5-turbo")
 output_parser = StrOutputParser()
@@ -135,8 +140,10 @@ async def ask_from_audio(file_name: str = Form(...), question: str = Form(...)):
     inputs = {"context": context, "question": question}
     result = chain.invoke(inputs)
 
-    return {"transcription": context, "answer": result}
+    # Log inputs for debugging
+    # print(f"Prompt: {prompt_text}")
 
+    return {"transcription": context, "answer": result}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
