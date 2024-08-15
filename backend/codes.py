@@ -17,6 +17,8 @@ import logging
 from pinecone import ServerlessSpec
 
 app = FastAPI()
+logging.basicConfig(level=logging.INFO)
+
 env_path = os.path.join(os.getcwd(), ".env")
 load_dotenv(dotenv_path=env_path)
 
@@ -95,49 +97,6 @@ chain = (
 def create_prompt(context, question):
     return f"""You are an expert on the following meeting's context: "{context}". Based on this context, answer the following question accurately: "{question}"."""
 
-
-def check_transcription_in_pinecone(filename):
-    """
-    Checks if a transcription with the given filename exists in Pinecone.
-    Assumes that `filename` is stored as a key in the metadata of each indexed item.
-    """
-    try:
-        # Query Pinecone by trying to fetch vectors where metadata matches the filename
-        search_results = index.query(
-            vector=[0]*embedding_dimension,  # A dummy vector since we focus on metadata
-            filter={"filename": filename},  # Assumes Pinecone supports filtering by metadata
-            top_k=1
-        )
-        
-        # Check if there are any matches
-        if search_results['matches']:
-            match = search_results['matches'][0]
-            if match.metadata['filename'] == filename:
-                logging.info(f"Found transcription for filename: {filename}")
-                return True
-        return False
-    
-    except Exception as e:
-        logging.error(f"Error checking transcription in Pinecone: {str(e)}")
-        return False
-
-
-def store_transcription_in_pinecone(text, metadata):
-    embedding = embeddings.embed_query(text)
-    logging.info("data inserted ", metadata)
-    logging.info("data inserted ", embedding)
-    index.upsert([(metadata["id"], embedding, metadata)])
-
-def retrieve_context_from_pinecone(query):
-    query_embedding = embeddings.embed_query(query)
-    logging.info("query_embedding ", query_embedding)
-
-    search_results = index.query(vector=query_embedding, top_k=5, include_metadata=True)
-    combined_context = " ".join([result["metadata"]["text"] for result in search_results["matches"]])
-
-    logging.info("combined_context ", combined_context)
-    return combined_context
-
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
     file_location = f"temp_{file.filename}"
@@ -188,16 +147,68 @@ async def transcribe_audio(file: UploadFile = File(...)):
         if os.path.exists(file_location):
             os.remove(file_location)
 
+
+def check_transcription_in_pinecone(filename):
+    """
+    Checks if a transcription with the given filename exists in Pinecone.
+    Assumes that `filename` is stored as a key in the metadata of each indexed item.
+    """
+    try:
+        logging.info(f"filename in check_transcription_in_pinecone: {filename} and {embedding_dimension}")
+        # Query Pinecone by trying to fetch vectors where metadata matches the filename
+        search_results = index.query(
+            vector=[0]*embedding_dimension,  # A dummy vector since we focus on metadata
+            filter={"filename": filename},  # Assumes Pinecone supports filtering by metadata
+            top_k=1,
+            include_metadata=True
+        )
+        logging.info(f"search_results in check_transcription_in_pinecone  {search_results}")
+
+        # Check if there are any matches
+        if search_results['matches']:
+            match = search_results['matches'][0]
+            if match.metadata['filename'] == filename:
+                logging.info(f"Found transcription for filename: {filename}")
+                return True
+        return False
+    
+    except Exception as e:
+        logging.error(f"Error checking transcription in Pinecone: {str(e)}")
+        return False
+
+
+def store_transcription_in_pinecone(text, metadata):
+    embedding = embeddings.embed_query(text)
+    metadata["text"] = text  
+    logging.info(f"data inserted {metadata}")
+    logging.info(f"data inserted {embedding}")
+    index.upsert([(metadata["id"], embedding, metadata)])
+
+def retrieve_context_from_pinecone(query):
+    query_embedding = embeddings.embed_query(query)
+    # logging.info(f"query_embedding {query_embedding}") working
+
+    search_results = index.query(vector=query_embedding, top_k=5, include_metadata=True)
+    logging.info(f"search_results in retrieve_context_from_pinecone  {search_results}")
+
+    combined_context = " ".join([result["metadata"]["text"] for result in search_results["matches"]])
+    logging.info(f"combined_context in retrieve_context_from_pinecone  {combined_context}")
+
+    return combined_context
+
 @app.post("/ask_from_audio/")
 async def ask_from_audio(file_name: str = Form(...), question: str = Form(...)):
     try:
+        logging.info(f"file_name: {file_name}")
+        logging.info(f"question: {question}")
+
         # Check transcription availability and retrieve combined context
         if not check_transcription_in_pinecone(file_name):
             raise HTTPException(status_code=404, detail="Transcription not found in Pinecone")
         
         # Retrieve the specific transcription context from Pinecone
         base_context = retrieve_context_from_pinecone(file_name)
-        logging.info("Base context from Pinecone: ", base_context)
+        logging.info(f"Base context from Pinecone: {base_context}")
 
     except Exception as e:
         logging.error(f"Error retrieving transcription: {str(e)}")
@@ -206,19 +217,19 @@ async def ask_from_audio(file_name: str = Form(...), question: str = Form(...)):
     try:
         # Retrieve additional relevant context from Pinecone based on the question
         retrieved_context = retrieve_context_from_pinecone(question)
-        logging.info("Retrieved additional context: ", retrieved_context)
+        logging.info(f"Retrieved additional context: {retrieved_context}")
 
         # Combine the base context with additional retrieved contexts
         full_context = f"{base_context} {retrieved_context}"
-        logging.info("Full combined context: ", full_context)
+        logging.info("Full combined context: {full_context}")
 
         # Prepare inputs for the LangChain
         inputs = {"context": full_context, "question": question}
-        logging.info("Inputs for LangChain: ", inputs)
+        logging.info(f"Inputs for LangChain: {inputs}")
 
         # Generate answer using LangChain
         result = chain.invoke(inputs)
-        logging.info("Generated Response from LangChain: ", result)
+        logging.info(f"Generated Response from LangChain: {result}")
 
         # Return the transcription and answer
         return {"transcription": base_context, "answer": result}
