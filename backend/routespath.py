@@ -5,8 +5,8 @@ import uvicorn
 from dotenv import load_dotenv
 from pinecone import Pinecone as client
 from langchain_community.vectorstores import Pinecone
-# from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.embeddings import JinaEmbeddings
+from langchain_community.embeddings import OpenAIEmbeddings
+# from langchain_community.embeddings import JinaEmbeddings
 # from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
@@ -15,6 +15,7 @@ from langchain_core.runnables import RunnableParallel, RunnableLambda
 import openai
 from pymongo import MongoClient
 import logging
+from pinecone import ServerlessSpec
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,20 +30,15 @@ client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Initialize Pinecone
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pinecone_environment = os.getenv("PINECONE_ENVIRONMENT")
-pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
+pinecone_index_name = os.getenv("PINECONE_INDEX_NAME_2")
 
 # Jina Embeddings
-jina_api_key = os.getenv("JINA_EMBEDDINGS_API_KEY")
+# jina_api_key = os.getenv("JINA_EMBEDDINGS_API_KEY")
 
 pc = client(
     api_key=pinecone_api_key,
     environment=pinecone_environment
 )
-
-# Access the index
-index = pc.Index(pinecone_index_name)
-index_stats = index.describe_index_stats()
-logging.info(f"Pinecone Index: {index_stats}")
 
 mongo_uri = os.getenv("MONGO_URI")
 client_mongo = MongoClient(mongo_uri)
@@ -52,6 +48,26 @@ collection = db_mongo["transcriptions"]
 # Setup LangChain components
 # embeddings = OpenAIEmbeddings(deployment="text-similarity-ada-001")
 embeddings = JinaEmbeddings(jina_api_key=jina_api_key, model_name='jina-clip-v1')
+# logging.info("embeddings ", embeddings)
+
+# Access the index
+index_name = pc.Index(pinecone_index_name)
+index_stats = index_name.describe_index_stats()
+logging.info(f"Pinecone Index: {index_stats}")
+
+# # Ensure the index is created with the correct dimension
+# if index_name not in pc.list_indexes():
+#     pc.create_index(
+#         name=index_name,
+#         dimension=embedding_dimension,  # Use the dynamic embedding dimension
+#         metric="cosine",
+#         spec=ServerlessSpec(
+#             cloud='aws', 
+#             region=pinecone_environment
+#         ) 
+#     )
+
+# jina
 vectorstore = Pinecone.from_existing_index(index_name=pinecone_index_name, embedding=embeddings)
 
 # def create_prompt(context, question):
@@ -154,22 +170,3 @@ async def ask_from_audio(file_name: str = Form(...), question: str = Form(...)):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-# Correct the prompt creation and the chain's invocation logic
-# chain = (
-#     RunnableParallel({"context": dynamic_retriever, "question": get_question})
-#     | RunnableLambda(lambda inputs: create_prompt(inputs["context"], inputs["question"]))
-#     | RunnableLambda(lambda prompt: [{"role": "user", "content": prompt}])  # Convert the prompt to the format expected by the LLM
-#     | llm
-#     | output_parser
-# )
-
-# RAG prompt
-# def create_prompt(context, question):
-#     return f"""The following is a transcript of a meeting. Please answer the question using only the information provided in this transcript.
-#     Transcript:
-#     {context}
-#     Question:
-#     {question}
-#     Please provide a clear and concise answer based on the transcript above."""
