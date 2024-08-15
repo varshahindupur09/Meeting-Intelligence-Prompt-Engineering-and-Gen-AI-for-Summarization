@@ -78,7 +78,8 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 # YouTube:
 
-# PDF: https://gamma.app/docs/Meeting-Gen-AI-Summarizing-and-Answering-Questions-4q52maqtrsgv6ud
+# PDF: 
+https://gamma.app/docs/Meeting-Gen-AI-Summarizing-and-Answering-Questions-4q52maqtrsgv6ud
 
 
 
