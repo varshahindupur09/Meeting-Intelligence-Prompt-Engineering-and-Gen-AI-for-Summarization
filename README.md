@@ -29,4 +29,17 @@ pip3.12 install pymongo
 
 conda deactivate
 source .venv_llm/bin/activate
+
+
+frontend: env
+BACKEND_URL="http://127.0.0.1:8000"
+
+backend: env
+OPENAI_API_KEY=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
+PINECONE_API_KEY=900e35e4-d1fa-48a9-9e0c-dffbe7937746
+PINECONE_ENVIRONMENT=us-east-1
+PINECONE_INDEX_NAME=audio-index
+MONGO_USER=varshahindupur
+MONGO_PASSWORD=ZNuy3Rbb2Z5pcQ6U
+MONGO_URI=mongodb+srv://varshahindupur:ZNuy3Rbb2Z5pcQ6U@cluster0.nvwwa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 cd backend
