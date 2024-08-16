@@ -77,6 +77,7 @@ This project is licensed under the MIT License. See the LICENSE file for more de
    Email: balchandani.r@northeastern.edu, GitHub: https://github.com/raunakbalchandani, LinkedIn: https://www.linkedin.com/in/raunak-balchandani-7090b1128/
 
 # YouTube:
+https://youtu.be/VaEv3H-WppY 
 
 # PDF: 
 https://gamma.app/docs/Meeting-Gen-AI-Summarizing-and-Answering-Questions-4q52maqtrsgv6ud
