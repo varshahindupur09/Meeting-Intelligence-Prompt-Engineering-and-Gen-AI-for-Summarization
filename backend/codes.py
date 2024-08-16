@@ -5,8 +5,6 @@ import uvicorn
 from dotenv import load_dotenv
 from pinecone import Pinecone as client
 from langchain_community.vectorstores import Pinecone
-# from langchain_community.embeddings import OpenAIEmbeddings
-# from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -105,7 +103,7 @@ async def transcribe_audio(file: UploadFile = File(...)):
         # Check if transcription already exists in MongoDB
         transcription_doc = collection.find_one({"filename": file.filename})
         if transcription_doc:
-            logging.info("MongoDB transcription")
+            logging.info("MongoDB transcription found!")
             store_transcription_in_pinecone(transcription_doc['transcription'], {"id": file.filename, "filename": file.filename})
             return {"transcription": transcription_doc["transcription"]}
 
@@ -120,21 +118,31 @@ async def transcribe_audio(file: UploadFile = File(...)):
                 model="whisper-1",
                 response_format="verbose_json"
             )
+        logging.info("")
+        logging.info("")
+        logging.info("***************************")
+        logging.info(f"Transcript: {type(transcript)}")
+        logging.info(f"Transcript: {transcript}")
 
-        # Debugging output to check the structure of the transcript response
-        logging.info("Transcript response: ", transcript)
+        # Check if the transcription was successful
+        logging.info("")
+        logging.info("")
+        logging.info("***************************")
+        # transcription_text = transcript['Transcription[text]']
+        # transcription_text = transcript['text']
+        transcription_text = transcript.text
+        logging.info(f"2222 Transcript: {transcription_text}")
 
-        transcription_text = transcript["text"]  # Extracting the text from the transcription response
 
         # Save the transcription to MongoDB
-        metadata = {"filename": file.filename, "id": file.filename}  # You can add more metadata as needed
+        metadata = {"filename": file.filename, "id": file.filename}  # Additional metadata can be added if needed
         collection.insert_one({
             "filename": file.filename,
             "transcription": transcription_text
         })
 
-        # Store the transcription in Pinecone
-        logging.info("WHisper transcription")
+        # Optionally store in Pinecone if needed
+        logging.info("Storing transcription in Pinecone")
         store_transcription_in_pinecone(transcription_text, metadata)
 
         return {"transcription": transcription_text}
