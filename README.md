@@ -34,10 +34,15 @@ Installation
 
 1. Create a .env file in the root directory and add the following environment variables:
 -> OPENAI_API_KEY=your_openai_api_key
+   
 -> PINECONE_API_KEY=your_pinecone_api_key
+
 -> PINECONE_ENVIRONMENT=your_pinecone_environment
+
 -> PINECONE_INDEX_NAME=your_pinecone_index_name
+
 -> MONGO_URI=your_mongodb_connection_string
+
 3. Pinecone Setup: Ensure you have set up a Pinecone index with the correct name and have your API key and environment ready.
 4. MongoDB Setup: Set up a MongoDB instance where the transcriptions will be stored. Use the connection string in the .env file.
 
