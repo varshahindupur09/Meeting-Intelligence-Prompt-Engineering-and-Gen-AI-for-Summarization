@@ -4,12 +4,13 @@ Project by: Varsha Hindupur (NUID: 002935078)
 
 Meeting Intelligence GenAI is an application designed to take input in the form of transcripts or audio from any meeting and allow users to ask questions about the meeting. The application uses a combination of transcription services, embeddings, and a language model to generate accurate and relevant responses based on the meeting's context.
 
-So,
-<p>Released a meeting intelligence app featuring a voice-to-text pipeline with GPT-3.5.</p>
-Utilized Kubernetes for deployment and load balancing, ensuring efficient performance.
-Integrated Azure DevOps for CI/CD, enhancing the deployment workflow.
-Employed Apache Airflow for workflow orchestration and management.
-Achieved a high success rate in addressing user queries, significantly improving meeting outcomes.
+In short,
+
+- Released a meeting intelligence app with a voice-to-text pipeline and GPT-3.5.
+- Utilized **Kubernetes** for deployment and load balancing, ensuring efficient performance.
+- Integrated **Azure DevOps** for CI/CD, enhancing the deployment workflow.
+- Employed **Apache Airflow** for workflow orchestration and management.
+- Achieved a high success rate in addressing user queries, significantly improving meeting outcomes.
 
 
 # Table of Contents
