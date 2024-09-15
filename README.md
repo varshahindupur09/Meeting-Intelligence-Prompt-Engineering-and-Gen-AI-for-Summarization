@@ -70,6 +70,7 @@ Installation
 4. LangChain - For chaining components together
 5. MongoDB - Database for storing transcriptions
 6. dotenv - For managing environment variables
+7. Airflow - for batch and streaming data processing
 
 # Contributing
 Contributions are welcome! Please submit a pull request or create an issue to discuss any changes.
