@@ -88,4 +88,4 @@ Varsha Hindupur:
 https://youtu.be/VaEv3H-WppY 
 
 # PDF: 
-https://gamma.app/docs/Meeting-Gen-AI-Summarizing-and-Answering-Questions-4q52maqtrsgv6ud
+https://gamma.app/docs/MeetIn-Enhanced-Meeting-Intelligence-with-LLM-Integration-dlegq10mrch398c?mode=doc
