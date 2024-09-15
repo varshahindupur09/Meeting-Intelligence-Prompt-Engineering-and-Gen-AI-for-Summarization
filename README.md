@@ -79,11 +79,8 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 # ContactUs:
 
-1. Varsha Hindupur:
+Varsha Hindupur:
    Email: hindupur.v@northeastern.edu, GitHub: https://github.com/varshahindupur09, LinkedIn: https://www.linkedin.com/in/varsha-hindupur/
-
-2. Raunak Balchandani:
-   Email: balchandani.r@northeastern.edu, GitHub: https://github.com/raunakbalchandani, LinkedIn: https://www.linkedin.com/in/raunak-balchandani-7090b1128/
 
 # YouTube:
 https://youtu.be/VaEv3H-WppY 
