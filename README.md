@@ -6,9 +6,7 @@ Meeting Intelligence GenAI is an application designed to take input in the form 
 
 In short,
 
-- Released a meeting intelligence app with a voice-to-text pipeline and GPT 4o model.
-- Utilized **Kubernetes** for deployment and load balancing, ensuring efficient performance.
-- Integrated **Azure DevOps** for CI/CD, enhancing the deployment workflow.
+- Released a meeting intelligence app with a voice-to-text pipeline and GPT 4o model and RAG with pinecone db
 - Employed **Apache Airflow** for workflow orchestration and management.
 - Achieved a high success rate in addressing user queries, significantly improving meeting outcomes.
 
