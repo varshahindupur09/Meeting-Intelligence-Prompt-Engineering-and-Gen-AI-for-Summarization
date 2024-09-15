@@ -80,9 +80,9 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 # ContactMe:
 
 Varsha Hindupur:
-   Email: hindupur.v@northeastern.edu, 
-   GitHub: https://github.com/varshahindupur09, 
-   LinkedIn: https://www.linkedin.com/in/varsha-hindupur/
+   Email: hindupur.v@northeastern.edu, <br>
+   GitHub: https://github.com/varshahindupur09, <br>
+   LinkedIn: https://www.linkedin.com/in/varsha-hindupur/ <br>
 
 # YouTube:
 https://youtu.be/VaEv3H-WppY 
