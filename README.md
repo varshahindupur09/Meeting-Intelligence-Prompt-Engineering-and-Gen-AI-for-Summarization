@@ -1,6 +1,6 @@
 # MeetingIntelligenceGenAI
 
-Project by: Varsha Hindupur (NUID: 002935078) & Raunak Balchandani (NUID: 002964444)
+Project by: Varsha Hindupur (NUID: 002935078)
 
 Meeting Intelligence GenAI is an application designed to take input in the form of transcripts or audio from any meeting and allow users to ask questions about the meeting. The application uses a combination of transcription services, embeddings, and a language model to generate accurate and relevant responses based on the meeting's context.
 
