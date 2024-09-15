@@ -6,10 +6,10 @@ Meeting Intelligence GenAI is an application designed to take input in the form 
 
 In short,
 
-- Released a meeting intelligence app with a voice-to-text pipeline and GPT 4o model and RAG with pinecone db
-- Employed **Apache Airflow** for workflow orchestration and management.
-- Achieved a high success rate in addressing user queries, significantly improving meeting outcomes.
-
+- Developed an AI-Powered Meeting Intelligence Application using FastAPI for the backend and Streamlit for the frontend to provide real-time audio transcription and query response.
+- Integrated OpenAI's Whisper and GPT-3.5 models for accurate audio transcription and AI-driven insights, enhancing meeting productivity.
+- Implemented data storage and retrieval using MongoDB for transcriptions and Pinecone for vector-based context retrieval, ensuring efficient and scalable data management.
+- Leveraged Apache Airflow for managing and orchestrating complex workflows within the application.
 
 # Table of Contents
 
