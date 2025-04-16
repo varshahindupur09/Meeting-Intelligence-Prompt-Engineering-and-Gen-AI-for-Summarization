@@ -24,6 +24,7 @@ In short,
 9. [License](#License)
 10. [ContactUs](#ContactUs)
 11. [YouTube](#YouTube)
+12. [ImageFrontend](#ImageFrontend)
     
 
 # Features
@@ -96,3 +97,7 @@ https://youtu.be/VaEv3H-WppY
 
 # PDF: 
 https://gamma.app/docs/MeetIn-Enhanced-Meeting-Intelligence-with-LLM-Integration-dlegq10mrch398c?mode=doc
+
+# ImageFrontend
+![meetin_firstpage](https://github.com/user-attachments/assets/64ca346f-5e6d-4d74-ba3f-87e89b326f22)
+
